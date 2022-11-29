@@ -10,8 +10,69 @@ fn main() {
                  6,
                  String::from("крипто"),
                  String::from("шифр")));
-}
 
+    println!();
+    println!();
+    println!("============== Poliby Square =============");
+    println!("Result: {}",
+             poliby_square(
+                 String::from("абвгдеєжзиійклмнопрстуфхцчшьюя"),
+                 6));
+}
+fn poliby_square(key: String, number_of_columns: i32) -> String {
+    let mut matrix: Vec<Vec<char>> = vec![];
+    push_to_matrix(&mut matrix, key, number_of_columns);
+    print_matrix(&matrix);
+    poliby_crypt(&mut matrix, String::from("заміна"))
+}
+fn poliby_crypt(matrix: &mut Vec<Vec<char>>, word_to_crypt: String) -> String
+{
+    let mut crypt_table: Vec<Vec<u8>> = Vec::new();
+
+    let mut horizontal_coords: Vec<u8> = Vec::new();
+    let mut vertical_coords: Vec<u8> = Vec::new();
+    for (index, char) in word_to_crypt.chars().enumerate() {
+        if let Some(result) = find_in_matrix_for_poliby_crypt(matrix.clone(),char) {
+            horizontal_coords.push(result.0 as u8);
+            vertical_coords.push(result.1 as u8);
+        }
+    }
+    crypt_table.push(horizontal_coords);
+    crypt_table.push(vertical_coords);
+
+    let mut indexes_of_crypt:Vec<Vec<u8>> = Vec::new();
+
+    for (index,vec) in crypt_table.iter().enumerate() {
+        let mut tmp:Vec<u8> = Vec::new();
+        for item in vec {
+            tmp.push(*item);
+            if tmp.len() == 2 {
+                indexes_of_crypt.push(tmp.clone());
+                tmp = Vec::new();
+            }
+        }
+    }
+
+    println!("Indexes of crypt: {:?}", indexes_of_crypt);
+
+    let mut result = String::new();
+    for indexes in indexes_of_crypt {
+        result.push(matrix[(indexes[0] - 1) as usize][(indexes[1] - 1) as usize]);
+    }
+
+    result
+}
+fn find_in_matrix_for_poliby_crypt(matrix: Vec<Vec<char>>, char: char) -> Option<(usize,usize)>
+{
+    for (vertical_index,item) in matrix.iter().enumerate() {
+        for (horizontal_index,ch) in item.iter().enumerate() {
+            if *ch == char {
+                return Some((vertical_index + 1,horizontal_index + 1));
+            }
+        }
+    }
+    None
+}
 fn crypto_word(key: String, number_of_columns: i32, row_key: String, column_key: String) -> String
 {
     let mut matrix: Vec<Vec<char>> = vec![];
