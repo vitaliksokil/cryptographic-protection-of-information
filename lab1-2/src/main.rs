@@ -4,42 +4,56 @@ use tabled::builder::Builder;
 use tabled::object::Rows;
 
 fn main() {
+    // реалізація матричного шифру з стовпцевим і рядковим ключами
     println!("Result: {}",
              crypto_word(
-                 String::from("програмне забезпечення"),
-                 6,
-                 String::from("крипто"),
-                 String::from("шифр")));
+                 String::from("програмне забезпечення"), // слово що шифрується
+                 6, // кількість колонок в матриці
+                 String::from("крипто"), // горизонтальний ключ
+                 String::from("шифр"))); // вертикальний ключ
 
     println!();
     println!();
+
+    // шифр для другого варіанту квадрата Полібія
     println!("============== Poliby Square =============");
     println!("Result: {}",
              poliby_square(
-                 String::from("абвгдеєжзиійклмнопрстуфхцчшьюя"),
-                 6));
+                 String::from("абвгдеєжзиійклмнопрстуфхцчшьюя"), // алфавіт
+                 6)); // кількість колонок в матриці
 }
+
+// -------------------------------- Функції для квадрата Полібія ---------------------------------
 fn poliby_square(key: String, number_of_columns: i32) -> String {
     let mut matrix: Vec<Vec<char>> = vec![];
-    push_to_matrix(&mut matrix, key, number_of_columns);
+    push_to_matrix(&mut matrix, key, number_of_columns); // генерим матрицю з алфавіту
     print_matrix(&matrix);
-    poliby_crypt(&mut matrix, String::from("заміна"))
+    poliby_crypt(&mut matrix, String::from("заміна")) // функція шифрування Полібі
 }
 fn poliby_crypt(matrix: &mut Vec<Vec<char>>, word_to_crypt: String) -> String
 {
+    // ініціалізація данних
     let mut crypt_table: Vec<Vec<u8>> = Vec::new();
 
     let mut horizontal_coords: Vec<u8> = Vec::new();
     let mut vertical_coords: Vec<u8> = Vec::new();
+
+    // пошук горизонтальних і вертикальних координат
     for (index, char) in word_to_crypt.chars().enumerate() {
         if let Some(result) = find_in_matrix_for_poliby_crypt(matrix.clone(),char) {
             horizontal_coords.push(result.0 as u8);
             vertical_coords.push(result.1 as u8);
         }
     }
-    crypt_table.push(horizontal_coords);
-    crypt_table.push(vertical_coords);
+    // запис горизонтальних і вертикальних координатів в 1 матрицю
+    crypt_table.push(horizontal_coords.clone());
+    crypt_table.push(vertical_coords.clone());
 
+
+    println!("Horizontal coords:\t {:?}",horizontal_coords);
+    println!("Vertical coords:\t {:?}",vertical_coords);
+
+    // перетворення горизонтальних і вертикальних координат в масиви по 2 цифри читаючи по рядкам
     let mut indexes_of_crypt:Vec<Vec<u8>> = Vec::new();
 
     for (index,vec) in crypt_table.iter().enumerate() {
@@ -53,17 +67,19 @@ fn poliby_crypt(matrix: &mut Vec<Vec<char>>, word_to_crypt: String) -> String
         }
     }
 
-    println!("Indexes of crypt: {:?}", indexes_of_crypt);
+    println!("По дві цифри читаючи по рядкам: {:?}", indexes_of_crypt);
 
+    // пошук символів(букв) в matrix(алфавіт) по нових координатах і запис їх в result
     let mut result = String::new();
     for indexes in indexes_of_crypt {
         result.push(matrix[(indexes[0] - 1) as usize][(indexes[1] - 1) as usize]);
     }
-
+    // повернення результату
     result
 }
 fn find_in_matrix_for_poliby_crypt(matrix: Vec<Vec<char>>, char: char) -> Option<(usize,usize)>
 {
+    // пошук координатів і повернення кортежа(tuple) з вертикальним і горизонтальнмм індексом + 1
     for (vertical_index,item) in matrix.iter().enumerate() {
         for (horizontal_index,ch) in item.iter().enumerate() {
             if *ch == char {
@@ -73,6 +89,9 @@ fn find_in_matrix_for_poliby_crypt(matrix: Vec<Vec<char>>, char: char) -> Option
     }
     None
 }
+// ------------------------------------------------------------------------------------------------
+
+
 fn crypto_word(key: String, number_of_columns: i32, row_key: String, column_key: String) -> String
 {
     let mut matrix: Vec<Vec<char>> = vec![];
@@ -93,6 +112,9 @@ fn crypto_word(key: String, number_of_columns: i32, row_key: String, column_key:
 
 fn push_to_matrix(matrix: &mut Vec<Vec<char>>, key: String, number_of_columns: i32)
 {
+    // функція для генерації матриці з заданого слова(ключа) key з кількістю колонок number_of_columns
+
+
     let mut temp_matrix: Vec<char> = vec![];
 
     for (_index, char) in key.chars().enumerate() {
@@ -118,6 +140,7 @@ fn push_to_matrix(matrix: &mut Vec<Vec<char>>, key: String, number_of_columns: i
 
 fn insert_word_to_matrix(matrix: &mut Vec<Vec<char>>, word: String, number_of_columns: i32)
 {
+    // функція для вставки нового слова ( горизонтально)
     if word.chars().count() <= number_of_columns as usize {
         matrix.insert(0, word.chars().collect());
     }
@@ -137,28 +160,30 @@ fn print_matrix(matrix: &Vec<Vec<char>>)
 
 fn sort_alphabetically_of_key(matrix: &mut Vec<Vec<char>>)
 {
-    // sort key
+    // сортування ключа
     let mut key_sort: Vec<char> = matrix.first().unwrap().clone();
     key_sort.sort();
-    // find new order of columns
+
+    // пошук нового порядку
     let mut new_order: HashMap<usize, usize> = HashMap::new();
     let key: Vec<char> = matrix.first().unwrap().clone();
 
     for (index, char) in key.iter().enumerate() {
         new_order.insert(index, key_sort.iter().position(|&x| x == *char).unwrap());
     }
-    // set new order
 
+    // перезапис колонок
     let mut new_matrix: Vec<Vec<char>> = vec![];
     for item in matrix.clone() {
         let mut row_btree: BTreeMap<usize, char> = BTreeMap::new();
-        // struct for new_order is = old_index => new_position
+
         for (old_i, new_i) in new_order.iter() {
-            // insert into new position item that lives now by old index
             row_btree.insert(*new_i, item[*old_i]);
         }
+
         new_matrix.push(row_btree.into_values().collect());
     }
+
     *matrix = new_matrix;
 }
 
@@ -182,33 +207,42 @@ fn insert_word_to_matrix_in_column(matrix: &mut Vec<Vec<char>>, word: String)
 
 fn sort_alphabetically_of_column_key(matrix: &mut Vec<Vec<char>>)
 {
+    // берем ключ який записаний в колонку і робим вектор
     let mut column_key: Vec<char> = Vec::new();
     for i in matrix.clone() {
         column_key.push(i[0]);
     }
+
+    // сортуєм вектор з ключем в колонку
     let mut sorted_column_key = column_key.clone();
     sorted_column_key.sort();
 
+    // шукємо новий порядок елементів
     let mut new_order: HashMap<usize, usize> = HashMap::new();
     for (index, char) in column_key.iter().enumerate() {
         new_order.insert(index, sorted_column_key.iter().position(|&x| x == *char).unwrap());
     }
 
+    // формуєм нову матрицю з переставленими рядками
     let mut new_matrix: Vec<Vec<char>> = vec![];
     let mut row_btree: BTreeMap<usize, Vec<char>> = BTreeMap::new();
-    // struct for new_order is = old_index => new_position
+    // структура для new_order = old_index => new_position
     for (old_i, new_i) in new_order.iter() {
-        // insert into new position item that lives now by old index
+        // вставка нової позиції яка знаходиться по old_index
         row_btree.insert(*new_i, matrix[*old_i].clone());
     }
+
+    // перезапис порядку рядків
     for new_row in row_btree.into_values() {
         new_matrix.push(new_row);
     }
+
     *matrix = new_matrix;
 }
 
 fn get_crypted_word(matrix: Vec<Vec<char>>) -> String
 {
+    // формування зашифрованого повідомлення з матриці
     let mut result = String::new();
     let mut is_first = true;
     for item in matrix {
