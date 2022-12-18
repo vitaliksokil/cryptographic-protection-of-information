@@ -15,7 +15,7 @@ fn main() {
     println!("Euler args: {:?} \nEuler Results: {:?}", m, phi(m));
     println!("------------------------------------------");
     println!("------------------------------------------");
-    let inverse_element2_args = (3, 34);
+    let inverse_element2_args = (5, 18);
     println!("Inverse Element 2 args: {:?} \nInverse Element 2 Results: {:?}", inverse_element2_args, inverse_element_2(inverse_element2_args.0, inverse_element2_args.1));
     println!("------------------------------------------");
 }
