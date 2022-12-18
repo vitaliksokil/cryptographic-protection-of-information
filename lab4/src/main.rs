@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused)]
+
 fn main() {
     println!("------------------------------------------");
     let gcdex_args = (612, 342);

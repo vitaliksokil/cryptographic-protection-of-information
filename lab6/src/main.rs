@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused)]
+
 const UNREDUCED: u32 = 0b00011011;
 
 fn main() {

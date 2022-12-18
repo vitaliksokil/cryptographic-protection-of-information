@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused)]
+
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use tabled::{Tabled, Table, Style, Alignment, ModifyObject};
 use tabled::builder::Builder;
@@ -96,17 +99,26 @@ fn crypto_word(key: String, number_of_columns: i32, row_key: String, column_key:
 {
     let mut matrix: Vec<Vec<char>> = vec![];
 
+    println!("Creating of matrix: ");
     push_to_matrix(&mut matrix, key, number_of_columns);
     print_matrix(&matrix);
-    insert_word_to_matrix(&mut matrix, row_key, number_of_columns);
-    print_matrix(&matrix);
-    sort_alphabetically_of_key(&mut matrix);
-    print_matrix(&matrix);
-    insert_word_to_matrix_in_column(&mut matrix, column_key);
-    print_matrix(&matrix);
-    sort_alphabetically_of_column_key(&mut matrix);
+
+    println!("Added key `{}`: ", &row_key);
+    insert_word_to_matrix(&mut matrix, row_key.clone(), number_of_columns);
     print_matrix(&matrix);
 
+    println!("Sorted columns by key `{}`: ", &row_key);
+    sort_alphabetically_of_key(&mut matrix);
+    print_matrix(&matrix);
+
+    println!("Added key `{}`: ", &column_key);
+    insert_word_to_matrix_in_column(&mut matrix, column_key.clone());
+    print_matrix(&matrix);
+
+    println!("Sorted rows by key `{}`: ", &column_key);
+    sort_alphabetically_of_column_key(&mut matrix);
+
+    print_matrix(&matrix);
     get_crypted_word(matrix)
 }
 
