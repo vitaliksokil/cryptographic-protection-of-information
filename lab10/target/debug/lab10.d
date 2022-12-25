@@ -1,1 +1,0 @@
-/Users/vitaliisokil/Work/University/cryptographic\ protection\ of\ information\ (LABS)/lab10/target/debug/lab10: /Users/vitaliisokil/Work/University/cryptographic\ protection\ of\ information\ (LABS)/lab10/src/main.rs
